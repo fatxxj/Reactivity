@@ -8,14 +8,13 @@ using Persistence;
 
 namespace Application.Activities
 {
-    public class Details
+    public class Create
     {
-        public class Query:IRequest<Activity>
+        public class Command: IRequest 
         {
-            public Guid Id {get;set;}
-
+            public Activity Activity {get;set;}
         }
-        public class Handler : IRequestHandler<Query, Activity>
+        public class Handler : IRequestHandler<Command>
         {
             private readonly DataContext context;
 
@@ -23,9 +22,12 @@ namespace Application.Activities
             {
                 this.context = context;
             }
-            public async Task<Activity> Handle(Query request, CancellationToken cancellationToken)
+
+            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                return await context.Activities.FindAsync(request.Id);//
+                context.Activities.Add(request.Activity);
+                await context.SaveChangesAsync();
+                return Unit.Value;
             }
         }
     }
